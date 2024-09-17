@@ -42,6 +42,6 @@ class Voter(Base):
 
 
 def create_tables(connection_string):
-    engine = create_engine('postgresql://username:password@localhost/mydatabase')
+    engine = create_engine(connection_string)
     Base.metadata.create_all(engine)
     return engine

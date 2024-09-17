@@ -41,21 +41,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  postgres:
-    image: postgres:latest
-    container_name: postgres
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: voting
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "postgres" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  
+  # postgres:
+  #   image: postgres:latest
+  #   container_name: postgres
+  #   ports:
+  #     - "5432:5432"
+  #   user: postgres
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: voting
+  #   healthcheck:
+  #     test: [ "CMD", "pg_isready", "-U", "postgres" ]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
       
   spark-master:
    image: bitnami/spark:latest
@@ -74,3 +75,28 @@ services:
      SPARK_WORKER_CORES: 2
      SPARK_WORKER_MEMORY: 1g
      SPARK_MASTER_URL: spark://spark-master:7077
+
+  db:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: voting
+    networks:
+      - app
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+      - "5433:5433"
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+networks:
+  app:
