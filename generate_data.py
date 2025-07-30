@@ -19,7 +19,7 @@ def generate_candidate_data(candidate_number: int, total_parties: int) -> dict:
     if response.status_code == 200:
         user_data = response.json()['results'][0]
 
-
+        print(user_data)
         return {
             "candidate_id": user_data['login']['uuid'],
             "candidate_name": f"{user_data['name']['first']} {user_data['name']['last']}",
@@ -30,3 +30,8 @@ def generate_candidate_data(candidate_number: int, total_parties: int) -> dict:
         }
     else:
         return "Error fetching data"
+
+if __name__ == "__main__":
+    for i in range(3):
+        candidate_data = generate_candidate_data(i, 3)
+        print(candidate_data)

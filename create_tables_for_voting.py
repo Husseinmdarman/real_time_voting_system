@@ -1,5 +1,7 @@
 from sqlalchemy import create_engine, Column, String, Integer, Text, TIMESTAMP, func, ForeignKey, PrimaryKeyConstraint
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy_utils import database_exists, create_database
+
 
 ###
 """"
@@ -16,7 +18,7 @@ class Candidate(Base):
     """
     __tablename__ = 'candidates'
     
-    candidate_id = Column('candidate.id',Integer, unique=True ,primary_key=True) # unique identifier for each candidate
+    candidate_id = Column('id',String(255), unique=True ,primary_key=True) # unique identifier for each candidate
     candidate_name = Column(String(255))
     party_affiliation = Column(String(255))
     biography = Column(Text)
@@ -30,7 +32,7 @@ class Voter(Base):
     """
     __tablename__ = 'voters'
     
-    voter_id = Column('voters.id',Integer, unique=True,primary_key=True) # unique identifier for each voter
+    voter_id = Column('id',String(255), unique=True,primary_key=True) # unique identifier for each voter
     voter_name = Column(String(255))
     date_of_birth = Column(String(255))
     gender = Column(String(255))
@@ -53,8 +55,8 @@ class Vote(Base):
     """
     __tablename__ = 'vote'
     
-    voter_id = Column(Integer, unique=True, nullable = False, ForeignKey('voters.id')) # unique identifier for each voter since they can only vote once
-    candidate_id = Column(Integer, nullable = False, ForeignKey('candidates.id')) # This is not unique since a candidate can receive multiple votes
+    voter_id = Column(String(255), ForeignKey('voters.id') ,unique=True, nullable = False) # unique identifier for each voter since they can only vote once
+    candidate_id = Column(String(255), ForeignKey('candidates.id'),nullable = False) # This is not unique since a candidate can receive multiple votes
     vote_time = Column(TIMESTAMP,  server_default=func.now(), nullable=False) # time when the vote was cast
 
     __table_args__ = ( PrimaryKeyConstraint(voter_id, candidate_id),
@@ -63,5 +65,9 @@ class Vote(Base):
 
 def create_tables(connection_string):
     engine = create_engine(connection_string)
+    
+    if not database_exists(engine.url):
+        create_database(engine.url)
+
     Base.metadata.create_all(engine)
     return engine
